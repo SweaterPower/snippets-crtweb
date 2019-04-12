@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+
+    mysql:
+        container_name: snippets_mysql
+        image: mysql
+        volumes:
+            - "./.data/db:/var/lib/mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    php:
+        container_name: snippets_php
+        build:
+            context: php
+            args:
+                HOST_USER_ID: ${DOCKER_USER_ID}
+                HOST_GROUP_ID: ${DOCKER_GROUP_ID}
+        volumes:
+            - ${DOCKER_APP_PATH}:/var/www:cached
+
+    nginx:
+        container_name: snippets_nginx
+        build:
+            context: nginx
+            args:
+                HOST_USER_ID: ${DOCKER_USER_ID}
+                HOST_GROUP_ID: ${DOCKER_GROUP_ID}
+        ports:
+            - 8080:80
+        volumes_from:
+            - php   
