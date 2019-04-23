@@ -1,20 +1,21 @@
-FROM nginx:alpine
+FROM debian:jessie
 
+MAINTAINER Maxence POUTORD <maxence.poutord@gmail.com>
 
-# copy configuration files
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY symfony.conf /etc/nginx/conf.d/default.conf
+RUN apt-get update && apt-get install -y \
+    nginx
 
+ADD nginx.conf /etc/nginx/
+ADD symfony.conf /etc/nginx/sites-available/
 
-# set php upstream port
+RUN ln -s /etc/nginx/sites-available/symfony.conf /etc/nginx/sites-enabled/symfony \
+&& rm /etc/nginx/sites-enabled/default
+
 RUN echo "upstream php-upstream { server php:9000; }" > /etc/nginx/conf.d/upstream.conf
 
-
-# change uid for nginx user to avoid problems with host permissions
-ARG HOST_USER_ID
-ARG HOST_GROUP_ID
-RUN if [ ! -z "$HOST_GROUP_ID" ] ; then addgroup -S -g $HOST_GROUP_ID www-data ; else addgroup -S www-data ; fi
-RUN if [ ! -z "$HOST_USER_ID" ] ; then adduser -S -u $HOST_USER_ID -G www-data www-data ; else adduser -S -G www-data www-data ; fi
-
+RUN usermod -u 1000 www-data
 
 CMD ["nginx"]
+
+EXPOSE 80
+EXPOSE 443

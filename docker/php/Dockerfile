@@ -1,62 +1,40 @@
-FROM php:7.2-fpm-alpine
+# See https://github.com/docker-library/php/blob/master/7.1/fpm/Dockerfile
+FROM php:7.1-fpm
+ARG TIMEZONE
 
-RUN set -xe && apk update && apk upgrade
+MAINTAINER Maxence POUTORD <maxence.poutord@gmail.com>
 
-RUN apk add --no-cache \
-    shadow \
-    libzip \
-    libintl \
-    icu \
-    icu-dev \
-    bash \
-    curl \
-    libmcrypt \
-    libmcrypt-dev \
-    libxml2-dev \
-    freetype \
-    freetype-dev \
-    libpng \
-    libpng-dev \
-    libjpeg-turbo \
-    libjpeg-turbo-dev \
-    postgresql-dev \
-    pcre-dev \
+RUN apt-get update && apt-get install -y \
+    openssl \
     git \
-    g++ \
-    make \
-    autoconf
+    unzip
 
-RUN  docker-php-ext-configure gd \
-    --with-gd \
-    --with-freetype-dir=/usr/include/ \
-    --with-png-dir=/usr/include/ \
-    --with-jpeg-dir=/usr/include/ && \
-  NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
-  docker-php-ext-install -j${NPROC} gd && \
-  apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+&& composer --version
 
-RUN docker-php-ext-install intl opcache pdo_pgsql zip pcntl sockets exif
+# Set timezone
+RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc/timezone \
+&& printf '[PHP]\ndate.timezone = "%s"\n', ${TIMEZONE} > /usr/local/etc/php/conf.d/tzone.ini \
+&& "date"
 
-RUN docker-php-source extract \
-    && pecl install xdebug \
-    && docker-php-ext-enable xdebug \
-    && docker-php-source delete
+# Type docker-php-ext-install to see available extensions
+RUN docker-php-ext-install pdo pdo_mysql
 
 
-# composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# install xdebug
+RUN pecl install xdebug \
+&& docker-php-ext-enable xdebug \
+&& echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&& echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&& echo "display_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&& echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&& echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&& echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&& echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 
-# change uid for nginx user to avoid problems with host permissions
-ARG HOST_USER_ID
-ARG HOST_GROUP_ID
-RUN if [ ! -z "$HOST_USER_ID" ] ; then usermod -u $HOST_USER_ID www-data ; fi
-RUN if [ ! -z "$HOST_GROUP_ID" ] ; then groupmod -g $HOST_GROUP_ID www-data ; fi
-RUN mkdir /var/session && chown www-data:www-data /var/session
-
-
-# symfony pool config
-COPY symfony.conf /usr/local/etc/php-fpm.d/symfony.conf
-
+RUN echo 'alias sf="php app/console"' >> ~/.bashrc \
+&& echo 'alias sf3="php bin/console"' >> ~/.bashrc
 
 WORKDIR /var/www

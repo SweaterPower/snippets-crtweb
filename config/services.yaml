@@ -5,6 +5,9 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    database_host: mysql
+    database_user: snippets
+    database_password: snippetspass
 
 services:
     # default configuration for services in *this* file
