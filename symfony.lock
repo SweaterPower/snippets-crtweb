@@ -490,6 +490,9 @@
     "twig/twig": {
         "version": "v2.7.4"
     },
+    "vkcom/vk-php-sdk": {
+        "version": "5.92.4"
+    },
     "webmozart/assert": {
         "version": "1.4.0"
     },

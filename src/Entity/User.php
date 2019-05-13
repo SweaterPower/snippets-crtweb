@@ -33,7 +33,7 @@ class User implements UserInterface
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $password;
 
@@ -68,6 +68,11 @@ class User implements UserInterface
      * @ORM\JoinColumn(nullable=false)
      */
     private $role;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $VkontakteId;
 
     public function __construct()
     {
@@ -258,5 +263,17 @@ class User implements UserInterface
     public function eraseConfirmToken()
     {
         $this->setEmailRequestToken('erased_token');
+    }
+
+    public function getVkontakteId(): ?string
+    {
+        return $this->VkontakteId;
+    }
+
+    public function setVkontakteId(?string $VkontakteId): self
+    {
+        $this->VkontakteId = $VkontakteId;
+
+        return $this;
     }
 }

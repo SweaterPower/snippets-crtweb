@@ -16,9 +16,11 @@ use App\Entity\User;
  */
 class ConfirmationController extends AbstractController
 {
-
     private $tokenTTL = 2;
 
+    /**
+     * @Route("/confirm/user={userId}/token={confirmToken}", name="app_confirmation")
+     */
     public function confirm(int $userId, string $confirmToken, Request $request, UserRepository $userRepo, UserStatusRepository $userStatusRepo)
     {
         $user = $userRepo->findOneBy(['id' => $userId]);

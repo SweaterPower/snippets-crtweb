@@ -28,7 +28,7 @@ class RegistrationController extends AbstractController
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
-
+        
         if ($form->isSubmitted() && $form->isValid()) {
             // encode the plain password
             $user->setPassword(
@@ -39,7 +39,7 @@ class RegistrationController extends AbstractController
             );
             $user->setEmail($form->get('email')->getData());
             $user->setUsername($form->get('username')->getData());
-            $user->setRole($roleRepo->findOneBy(['code' => 'admin']));
+            $user->setRole($roleRepo->findOneBy(['code' => 'user']));
             $user->setStatus($statusRepo->findOneBy(['code' => 'not_confirmed']));
             $user->generateEmailToken();
 
@@ -47,7 +47,7 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $url = $this->generateUrl('confirmation',
+            $url = $this->generateUrl('app_confirmation',
                 [
                   'userId' => $user->getId(),
                   'confirmToken' => $user->getEmailRequestToken(),
@@ -62,11 +62,11 @@ class RegistrationController extends AbstractController
                     'confirmation/message.html.twig',
                     [
                       'url' => $url,
-                    ]),
-                    'text/html');
+                ]),
+                'text/html');
             $mailer->send($message);
 
-            return $this->redirectToRoute('_profiler_home');
+            return $this->render('registration/confirm.html.twig');
         }
 
         return $this->render('registration/register.html.twig', [

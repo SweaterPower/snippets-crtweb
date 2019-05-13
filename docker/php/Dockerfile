@@ -21,6 +21,8 @@ RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} >
 # Type docker-php-ext-install to see available extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
+RUN apt-get update && apt-get install -y zlib1g-dev \
+    && docker-php-ext-install zip
 
 # install xdebug
 RUN pecl install xdebug \
