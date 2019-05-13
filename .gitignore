@@ -21,6 +21,7 @@
 /nbproject/
 /nbproject
 
+/docker/
 /docker/runcmd.bat
 /docker/runphpbash.bat
 /docker/startdocker.bat
