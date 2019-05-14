@@ -107,4 +107,17 @@ class Snippet
 
         return $this;
     }
+    
+    private function getToken(): string
+    {
+        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+    }
+    
+    public function generateUrlCode() :string
+    {
+        $code = $this->getToken();
+        $this->setUrlCode($code);
+        
+        return $code;
+    }
 }
