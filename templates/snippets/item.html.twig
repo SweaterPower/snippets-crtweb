@@ -1,9 +1,8 @@
 <div>
-    <div>=================[snippet: "{{ snippet.title }}"]=================</div>
+    <div>=====[snippet: "{{ snippet.title }}"]=====</div>
     <b>Created by: {{  snippet.user.username }}</b><br>
     <b>Access type: {{ snippet.accessType.title }}</b><br>
     <a>Snippet text:<br>{{ snippet.text }}</a><br>
     <a href="/snippets/edit/code={{ snippet.urlCode }}">edit</a><br>
     <a href="/snippets/delete/code={{ snippet.urlCode }}" onclick="return confirm('Are you sure?')">delete</a>
-    <div>================================================</div>
 </div>

@@ -59,7 +59,6 @@ class SecurityController extends AbstractController
         } else {
             return $this->render('confirmation/expired.html.twig');
         }
-        return $this->redirectToRoute('app_register');
     }
 
     /**

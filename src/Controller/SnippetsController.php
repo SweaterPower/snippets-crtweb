@@ -51,7 +51,7 @@ class SnippetsController extends AbstractController
             return $this->redirectToRoute('app_snippets');
         }
 
-        return $this->render('snippets/add.html.twig', [
+        return $this->render('snippets/form.html.twig', [
               'form' => $form->createView(),
         ]);
     }
@@ -59,7 +59,7 @@ class SnippetsController extends AbstractController
     /**
      * @Route("/snippets/detail/code={code}", name="app_snippetdetail")
      */
-    public function item(string $code, Request $request): Response
+    public function item(string $code): Response
     {
         $snippet = $this->getDoctrine()->getManager()->getRepository(Snippet::class)->findOneBy(["urlCode" => $code]);
         return $this->render('snippets/detail.html.twig', [
@@ -70,7 +70,7 @@ class SnippetsController extends AbstractController
     /**
      * @Route("/snippets/delete/code={code}", name="app_snippetdelete")
      */
-    public function delete(string $code, Request $request): Response
+    public function delete(string $code): Response
     {
         $manager = $this->getDoctrine()->getManager();
         $snippet = $manager->getRepository(Snippet::class)->findOneBy(["urlCode" => $code]);
@@ -100,7 +100,7 @@ class SnippetsController extends AbstractController
             return $this->redirectToRoute('app_snippets');
         }
 
-        return $this->render('snippets/add.html.twig', [
+        return $this->render('snippets/form.html.twig', [
               'form' => $form->createView(),
         ]);
     }
