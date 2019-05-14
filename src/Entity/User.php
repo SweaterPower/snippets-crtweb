@@ -69,11 +69,6 @@ class User implements UserInterface
      */
     private $role;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $VkontakteId;
-
     public function __construct()
     {
         $this->setEmailRequestToken('');
@@ -188,7 +183,7 @@ class User implements UserInterface
     /**
      * @return Collection|Snippet[]
      */
-    public function getSnippets(): Collection
+    public function getSnippets(): array
     {
         return $this->snippets;
     }
@@ -246,7 +241,7 @@ class User implements UserInterface
         $this->setEmailRequestDatetime(new DateTime('now'));
     }
 
-    function getToken(): string
+    private function getToken(): string
     {
         return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
     }
@@ -263,17 +258,5 @@ class User implements UserInterface
     public function eraseConfirmToken()
     {
         $this->setEmailRequestToken('erased_token');
-    }
-
-    public function getVkontakteId(): ?string
-    {
-        return $this->VkontakteId;
-    }
-
-    public function setVkontakteId(?string $VkontakteId): self
-    {
-        $this->VkontakteId = $VkontakteId;
-
-        return $this;
     }
 }

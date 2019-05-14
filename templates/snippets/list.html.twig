@@ -3,5 +3,10 @@
 {% block title %}Snippets{% endblock %}
 
 {% block body %}
-    <hl>Placeholder for snippets list.</hl>
+    <hl>Placeholder for snippets list.</hl><br>
+    <a href="/snippets/add">Add new snippet</a>
+    {% for snippet in snippets %}
+        {% include 'snippets/item.html.twig' with {'snippet': snippet}%}
+        <a href="/snippets/detail/code={{ snippet.urlCode }}">link</a><br>
+    {% endfor %}
 {% endblock %}
