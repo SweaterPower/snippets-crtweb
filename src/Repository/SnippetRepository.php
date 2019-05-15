@@ -19,32 +19,33 @@ class SnippetRepository extends ServiceEntityRepository
         parent::__construct($registry, Snippet::class);
     }
 
-    // /**
-    //  * @return Snippet[] Returns an array of Snippet objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * Возвращает все сниппеты для указанного владельца
+     * 
+     * @param int $value
+     * @return Snippet[]
+     */
+    public function findByOwner($value)
     {
         return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
+            ->andWhere('s.owner = :val')
             ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Snippet
+    
+    /**
+     * Возвращает только публичные сниппеты
+     * 
+     * @return Snippet[]
+     */
+    public function getPublicOnly()
     {
         return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('s.isPrivate = 0')
             ->getQuery()
-            ->getOneOrNullResult()
+            ->getResult()
         ;
     }
-    */
 }

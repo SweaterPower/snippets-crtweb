@@ -64,9 +64,9 @@ class SecurityController extends AbstractController
             $manager->flush();
 
             return $this->render('confirmation/confirmed.html.twig', [
-                  'userId' => $userId,
-                  'userName' => $user->getUsername(),
-                  'confirmToken' => $confirmToken,
+                    'userId' => $userId,
+                    'userName' => $user->getUsername(),
+                    'confirmToken' => $confirmToken,
             ]);
         } else {
             return $this->render('confirmation/expired.html.twig');
@@ -112,7 +112,7 @@ class SecurityController extends AbstractController
         }
 
         return $this->render('registration/register.html.twig', [
-              'registrationForm' => $form->createView(),
+                'registrationForm' => $form->createView(),
         ]);
     }
 
@@ -126,8 +126,8 @@ class SecurityController extends AbstractController
     {
         $url = $this->generateUrl('app_confirmation',
             [
-              'userId' => $user->getId(),
-              'confirmToken' => $user->getEmailRequestToken(),
+                'userId' => $user->getId(),
+                'confirmToken' => $user->getEmailRequestToken(),
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
@@ -138,7 +138,7 @@ class SecurityController extends AbstractController
             ->setBody($this->renderView(
                 'confirmation/message.html.twig',
                 [
-                  'url' => $url,
+                    'url' => $url,
             ]),
             'text/html');
         $mailer->send($message);

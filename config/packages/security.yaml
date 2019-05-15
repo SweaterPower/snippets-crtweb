@@ -20,10 +20,13 @@ security:
                 authenticators:
                     - App\Security\LoginFormAuthenticator
             form_login: true
+            logout:
+                path:   app_logout
+
        
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/snippets, roles: ROLE_USER }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/snippets, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/admin, roles: ROLE_ADMIN }
