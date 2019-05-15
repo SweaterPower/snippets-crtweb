@@ -25,3 +25,4 @@
 /docker/runphpbash.bat
 /docker/startdocker.bat
 /docker/var
+/docker/logs
