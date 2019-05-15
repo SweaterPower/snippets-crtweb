@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Snippet;
-use App\Entity\AccessType;
 use App\Form\SnippetFormType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Security;
@@ -45,11 +44,9 @@ class SnippetsController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $manager = $this->getDoctrine()->getManager();
-            $statusCode = $form->get('private') ? 'private' : 'public';
             $user = $security->getUser();
             
-            $snippet->setAccessType($manager->getRepository(AccessType::class)->findOneBy(['code' => $statusCode]));
-            $snippet->setUser($user);
+            $snippet->setOwner($user);
             $snippet->generateUrlCode();
             
             $manager->persist($snippet);
@@ -71,7 +68,7 @@ class SnippetsController extends AbstractController
     public function item(string $code): Response
     {
         $snippet = $this->getDoctrine()->getManager()->getRepository(Snippet::class)->findOneBy(["urlCode" => $code]);
-        return $this->render('snippets/detail.html.twig', [
+        return $this->render('snippets/item.html.twig', [
               'snippet' => $snippet,
         ]);
     }
@@ -106,8 +103,6 @@ class SnippetsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $statusCode = $form->get('private') ? 'private' : 'public';
-            $snippet->setAccessType($manager->getRepository(AccessType::class)->findOneBy(['code' => $statusCode]));
             $manager->flush();
             
             return $this->redirectToRoute('app_snippets');

@@ -20,13 +20,14 @@ use Swift_Mailer;
  */
 class SecurityController extends AbstractController
 {
+
     /**
      * Время жизни токена подтверждения электронной почты
      * 
      * @var int
      */
     private $tokenTTL = 5;
-    
+
     /**
      * Аутентификация пользователя по логину и паролю
      * 
@@ -87,7 +88,7 @@ class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $manager = $this->getDoctrine()->getManager();
 
-            $userRole = $manager->getRepository(UserRole::class)->findOneBy(['code' => 'user']);
+            $userRole = $manager->getRepository(UserRole::class)->findOneBy(['code' => 'ROLE_USER']);
             $userStatus = $manager->getRepository(UserStatus::class)->findOneBy(['code' => 'not_confirmed']);
 
             if ($userRole !== null && $userStatus !== null) {
@@ -97,31 +98,14 @@ class SecurityController extends AbstractController
                         $form->get('plainPassword')->getData()
                     )
                 );
-                $user->setRole($userRole);
+                $user->addRole($userRole);
                 $user->setStatus($userStatus);
                 $user->generateEmailToken();
 
                 $manager->persist($user);
                 $manager->flush();
 
-                $url = $this->generateUrl('app_confirmation',
-                    [
-                      'userId' => $user->getId(),
-                      'confirmToken' => $user->getEmailRequestToken(),
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                );
-
-                $message = (new \Swift_Message('Confirm email'))
-                    ->setFrom('send@snpcrt.com')
-                    ->setTo($user->getEmail())
-                    ->setBody($this->renderView(
-                        'confirmation/message.html.twig',
-                        [
-                          'url' => $url,
-                    ]),
-                    'text/html');
-                $mailer->send($message);
+                $this->SendConfirtamionEmail($mailer, $user);
 
                 return $this->render('registration/confirm.html.twig');
             }
@@ -130,6 +114,34 @@ class SecurityController extends AbstractController
         return $this->render('registration/register.html.twig', [
               'registrationForm' => $form->createView(),
         ]);
+    }
+
+    /**
+     * Отправляет на почту сообщение о подтверждении почты
+     * 
+     * @param Swift_Mailer $mailer
+     * @param User $user
+     */
+    private function SendConfirtamionEmail(Swift_Mailer $mailer, User $user)
+    {
+        $url = $this->generateUrl('app_confirmation',
+            [
+              'userId' => $user->getId(),
+              'confirmToken' => $user->getEmailRequestToken(),
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $message = (new \Swift_Message('Confirm email'))
+            ->setFrom('send@snpcrt.com')
+            ->setTo($user->getEmail())
+            ->setBody($this->renderView(
+                'confirmation/message.html.twig',
+                [
+                  'url' => $url,
+            ]),
+            'text/html');
+        $mailer->send($message);
     }
 
 }

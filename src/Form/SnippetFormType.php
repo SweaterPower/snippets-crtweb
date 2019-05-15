@@ -20,7 +20,7 @@ class SnippetFormType extends AbstractType
         $builder
             ->add('title')
             ->add('text', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class)
-            ->add('private', \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class, ["mapped" => false, 'required' => false])
+            ->add('isPrivate', \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class, ['required' => false])
             ->add('save', \Symfony\Component\Form\Extension\Core\Type\SubmitType::class);
     }
 }

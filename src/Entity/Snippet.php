@@ -42,20 +42,19 @@ class Snippet
     private $urlCode;
 
     /**
-     * Уровени доступа к сниппету (публичный или приватный)
-     * 
-     * @ORM\ManyToOne(targetEntity="App\Entity\AccessType")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $accessType;
-
-    /**
      * Владелец сниппета
      * 
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="snippets")
      * @ORM\JoinColumn(nullable=false)
      */
     private $owner;
+
+    /**
+     * Уровень доступа к сниппету (публичный или приватный)
+     * 
+     * @ORM\Column(type="boolean")
+     */
+    private $isPrivate;
 
     public function getId(): ?int
     {
@@ -98,18 +97,6 @@ class Snippet
         return $this;
     }
 
-    public function getAccessType(): ?AccessType
-    {
-        return $this->accessType;
-    }
-
-    public function setAccessType(?AccessType $accessType): self
-    {
-        $this->accessType = $accessType;
-
-        return $this;
-    }
-
     public function getOwner(): ?User
     {
         return $this->owner;
@@ -118,6 +105,18 @@ class Snippet
     public function setOwner(?User $user): self
     {
         $this->owner = $user;
+
+        return $this;
+    }
+
+    public function getIsPrivate(): ?bool
+    {
+        return $this->isPrivate;
+    }
+
+    public function setIsPrivate(bool $isPrivate): self
+    {
+        $this->isPrivate = $isPrivate;
 
         return $this;
     }

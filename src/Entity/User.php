@@ -67,7 +67,7 @@ class User implements UserInterface
     /**
      * Сниппеты пользователя.
      * 
-     * @ORM\OneToMany(targetEntity="App\Entity\Snippet", mappedBy="user", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Snippet", mappedBy="owner", orphanRemoval=true)
      */
     private $snippets;
 
@@ -80,22 +80,17 @@ class User implements UserInterface
     private $status;
 
     /**
+     * Роли пользователя.
+     * 
+     * @var ArrayCollection
      * @ORM\ManyToMany(targetEntity="App\Entity\UserRole")
      */
     private $roles;
 
-    /**
-     * Роль пользователя.
-     * 
-     * @ ORM\ManyToOne(targetEntity="App\Entity\UserRole")
-     * @ ORM\JoinColumn(nullable=false)
-     
-    private $role;*/
-
     public function __construct()
     {
         $this->setEmailRequestToken('');
-        $this->setEmailRequestDatetime(new DateTime());
+        $this->roles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -195,7 +190,7 @@ class User implements UserInterface
     {
         if (!$this->snippets->contains($snippet)) {
             $this->snippets[] = $snippet;
-            $snippet->setUser($this);
+            $snippet->setOwner($this);
         }
 
         return $this;
@@ -206,8 +201,8 @@ class User implements UserInterface
         if ($this->snippets->contains($snippet)) {
             $this->snippets->removeElement($snippet);
             // set the owning side to null (unless already changed)
-            if ($snippet->getUser() === $this) {
-                $snippet->setUser(null);
+            if ($snippet->getOwner() === $this) {
+                $snippet->setOwner(null);
             }
         }
 
@@ -248,10 +243,14 @@ class User implements UserInterface
      * @see UserInterface
      * @return (Role|string)[]
      */
-    public function getRoles(): Collection
+    public function getRoles(): array
     {
-        $roles = array_filter($this->roles, function ($item) { return $item->getCode(); });
-        return $roles;
+        $ret = [];
+        foreach ($this->roles as $role)
+        {
+            $ret[] = $role->getCode();
+        }
+        return $ret;
     }
 
     /**

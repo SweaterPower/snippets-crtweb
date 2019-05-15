@@ -1,7 +1,13 @@
 <div>
     <div>=====[snippet: "{{ snippet.title }}"]=====</div>
-    <b>Created by: {{  snippet.user.username }}</b><br>
-    <b>Access type: {{ snippet.accessType.title }}</b><br>
+    <b>Created by: {{  snippet.owner.username }}</b><br>
+    <b>Access type: 
+        {% if snippet.isPrivate %}
+            Private
+        {% else %}
+            Public
+        {% endif %}
+    </b><br>
     <a>Snippet text:<br>{{ snippet.text }}</a><br>
     <a href="/snippets/edit/code={{ snippet.urlCode }}">edit</a><br>
     <a href="/snippets/delete/code={{ snippet.urlCode }}" onclick="return confirm('Are you sure?')">delete</a>
