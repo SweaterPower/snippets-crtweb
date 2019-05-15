@@ -5,11 +5,15 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Уровень доступа к сниппету
+ * 
  * @ORM\Entity(repositoryClass="App\Repository\AccessTypeRepository")
  */
 class AccessType
 {
     /**
+     * Уникальный идентификатор
+     * 
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -17,11 +21,15 @@ class AccessType
     private $id;
 
     /**
+     * Кодовое обозначение
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $code;
 
     /**
+     * Название
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $title;

@@ -10,6 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 
+/**
+ * Форма для добавления или редактирования сниппета
+ */
 class SnippetFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

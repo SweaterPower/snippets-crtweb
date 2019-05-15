@@ -8,13 +8,13 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Добавляет статусы пользователя
  */
 final class Version20190422132306 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'add user statuses';
     }
 
     public function up(Schema $schema) : void

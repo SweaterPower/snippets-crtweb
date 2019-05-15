@@ -5,11 +5,16 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Роль пользователя.
+ * Позволяет регулировать, к каким разделам сайта пользователь имеет доступ.
+ * 
  * @ORM\Entity(repositoryClass="App\Repository\UserRoleRepository")
  */
 class UserRole
 {
     /**
+     * Уникальный идентификатор.
+     * 
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -17,11 +22,15 @@ class UserRole
     private $id;
 
     /**
+     * Кодовое обозначение.
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $code;
 
     /**
+     * Название роли.
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $title;

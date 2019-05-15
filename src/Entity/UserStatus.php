@@ -5,11 +5,16 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Статус пользователя.
+ * Отображает прогресс в подтверждении регистрации по электронной почте.
+ * 
  * @ORM\Entity(repositoryClass="App\Repository\UserStatusRepository")
  */
 class UserStatus
 {
     /**
+     * Уникальный идентификатор.
+     * 
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -17,11 +22,15 @@ class UserStatus
     private $id;
 
     /**
+     * Кодовое обозначение.
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $code;
 
     /**
+     * Название статуса.
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $title;

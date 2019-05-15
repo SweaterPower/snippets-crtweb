@@ -8,13 +8,13 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Добавляет роли пользователей
  */
 final class Version20190423062512 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'add user roles';
     }
 
     public function up(Schema $schema) : void

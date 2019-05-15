@@ -12,10 +12,15 @@ use App\Form\SnippetFormType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Security;
 
+/**
+ * Контроллер для просмотра списка, редактирования, добавления и удаления сниппетов.
+ */
 class SnippetsController extends AbstractController
 {
 
     /**
+     * Вывод списка сниппетов
+     * 
      * @Route("/snippets", name="app_snippets")
      */
     public function list(): Response
@@ -27,6 +32,8 @@ class SnippetsController extends AbstractController
     }
 
     /**
+     * Добавление нового сниппета
+     * 
      * @Route("/snippets/add", name="app_addsnippet")
      */
     public function add(Request $request, Security $security): Response
@@ -57,6 +64,8 @@ class SnippetsController extends AbstractController
     }
 
     /**
+     * Вывод сниппета
+     * 
      * @Route("/snippets/detail/code={code}", name="app_snippetdetail")
      */
     public function item(string $code): Response
@@ -68,6 +77,8 @@ class SnippetsController extends AbstractController
     }
 
     /**
+     * Удаление сниппета
+     * 
      * @Route("/snippets/delete/code={code}", name="app_snippetdelete")
      */
     public function delete(string $code): Response
@@ -81,6 +92,8 @@ class SnippetsController extends AbstractController
     }
     
     /**
+     * Редактирование сниппета
+     * 
      * @Route("/snippets/edit/code={code}", name="app_snippetedit")
      */
     public function edit(string $code, Request $request): Response

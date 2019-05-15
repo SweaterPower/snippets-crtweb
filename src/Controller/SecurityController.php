@@ -15,12 +15,21 @@ use App\Entity\UserStatus;
 use App\Entity\UserRole;
 use Swift_Mailer;
 
+/**
+ * Контроллер для регистрации, подтверждения регистрации и логина пользователей.
+ */
 class SecurityController extends AbstractController
 {
-    //время жизни токена подтверждения электронной почты
+    /**
+     * Время жизни токена подтверждения электронной почты
+     * 
+     * @var int
+     */
     private $tokenTTL = 5;
     
     /**
+     * Аутентификация пользователя по логину и паролю
+     * 
      * @Route("/login", name="app_login")
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
@@ -34,6 +43,8 @@ class SecurityController extends AbstractController
     }
 
     /**
+     * Проверка токена и TTL при подтверждении регистрации пользователя
+     * 
      * @Route("/confirm/user={userId}/token={confirmToken}", name="app_confirmation")
      */
     public function confirm(int $userId, string $confirmToken)
@@ -62,6 +73,8 @@ class SecurityController extends AbstractController
     }
 
     /**
+     * Регистрация пользователя
+     * 
      * @Route("/register", name="app_register")
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, Swift_Mailer $mailer): Response

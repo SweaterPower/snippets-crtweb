@@ -8,13 +8,13 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Добавляет таблицу для уровней доступа к сниппету
  */
 final class Version20190416063335 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'add access type table';
     }
 
     public function up(Schema $schema) : void

@@ -2,12 +2,17 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Role\Role;
 use DateTime;
 
 /**
+ * Хранит всю основную информацию о пользователе.
+ * 
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
  */
@@ -15,6 +20,8 @@ class User implements UserInterface
 {
 
     /**
+     * Уникальный идентификатор.
+     * 
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -22,58 +29,73 @@ class User implements UserInterface
     private $id;
 
     /**
+     * Адрес электронной почты.
+     * 
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
 
     /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
-
-    /**
+     * Пароль пользователя в зашифрованном виде.
+     * 
      * @var string The hashed password
      * @ORM\Column(type="string", nullable=true)
      */
     private $password;
 
     /**
+     * Имя пользователя.
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $username;
 
     /**
+     * Уникальный токен для подтверждения электронной почты.
+     * 
      * @ORM\Column(type="string", length=255)
      */
     private $emailRequestToken;
 
     /**
+     * Время отправки сообщения для подвтерждения на электронную почту.
+     * 
      * @ORM\Column(type="datetime")
      */
     private $emailRequestDatetime;
 
     /**
+     * Сниппеты пользователя.
+     * 
      * @ORM\OneToMany(targetEntity="App\Entity\Snippet", mappedBy="user", orphanRemoval=true)
      */
     private $snippets;
 
     /**
+     * Статус пользователя.
+     * 
      * @ORM\ManyToOne(targetEntity="App\Entity\UserStatus")
      * @ORM\JoinColumn(nullable=false)
      */
     private $status;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\UserRole")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToMany(targetEntity="App\Entity\UserRole")
      */
-    private $role;
+    private $roles;
+
+    /**
+     * Роль пользователя.
+     * 
+     * @ ORM\ManyToOne(targetEntity="App\Entity\UserRole")
+     * @ ORM\JoinColumn(nullable=false)
+     
+    private $role;*/
 
     public function __construct()
     {
         $this->setEmailRequestToken('');
         $this->setEmailRequestDatetime(new DateTime());
-        $this->setRoles([]);
     }
 
     public function getId(): ?int
@@ -89,25 +111,6 @@ class User implements UserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
 
         return $this;
     }
@@ -223,29 +226,54 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getRole(): ?UserRole
+    public function addRole(UserRole $role): self
     {
-        return $this->role;
-    }
-
-    public function setRole(?UserRole $role): self
-    {
-        $this->role = $role;
+        if (!$this->roles->contains($role)) {
+            $this->roles[] = $role;
+        }
 
         return $this;
     }
 
+    public function removeRole(UserRole $role): self
+    {
+        if ($this->roles->contains($role)) {
+            $this->roles->removeElement($role);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     * @return (Role|string)[]
+     */
+    public function getRoles(): Collection
+    {
+        $roles = array_filter($this->roles, function ($item) { return $item->getCode(); });
+        return $roles;
+    }
+
+    /**
+     * 
+     */
     public function generateEmailToken()
     {
         $this->setEmailRequestToken($this->getToken());
         $this->setEmailRequestDatetime(new DateTime('now'));
     }
 
+    /**
+     * 
+     */
     private function getToken(): string
     {
         return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
     }
 
+    /**
+     * 
+     */
     //в минутах
     public function getConfirmTokenLifetime(): int
     {
@@ -255,6 +283,9 @@ class User implements UserInterface
         return $time;
     }
 
+    /**
+     * 
+     */
     public function eraseConfirmToken()
     {
         $this->setEmailRequestToken('erased_token');
