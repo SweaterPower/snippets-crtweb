@@ -117,7 +117,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * Отправляет на почту сообщение о подтверждении почты
+     * Отправляет на почту сообщение для подтверждения почты
      * 
      * @param Swift_Mailer $mailer
      * @param User $user
