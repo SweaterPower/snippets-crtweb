@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Validator\Constraints as Assert;
 use DateTime;
 
 /**
@@ -15,6 +16,7 @@ use DateTime;
  * 
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
+ * @ORM\Table(indexes={@ORM\Index(name="username_idx", columns={"username"})})
  */
 class User implements UserInterface
 {
@@ -31,6 +33,7 @@ class User implements UserInterface
     /**
      * Адрес электронной почты.
      * 
+     * @Assert\Email
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
@@ -46,7 +49,8 @@ class User implements UserInterface
     /**
      * Имя пользователя.
      * 
-     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @ORM\Column(type="string", length=255, unique = true)
      */
     private $username;
 
@@ -246,47 +250,30 @@ class User implements UserInterface
     public function getRoles(): array
     {
         $ret = [];
-        foreach ($this->roles as $role)
-        {
+        foreach ($this->roles as $role) {
             $ret[] = $role->getCode();
         }
         return $ret;
     }
 
     /**
-     * 
+     * Обновляет токен и время появления токена
      */
-    public function generateEmailToken()
+    public function updateEmailToken(string $token)
     {
-        $this->setEmailRequestToken($this->getToken());
+        $this->setEmailRequestToken($token);
         $this->setEmailRequestDatetime(new DateTime('now'));
     }
 
     /**
-     * 
+     * Время, прошедшее с момента отправки сообщения о подтверждении почты (в минутах)
      */
-    private function getToken(): string
-    {
-        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
-    }
-
-    /**
-     * 
-     */
-    //в минутах
     public function getConfirmTokenLifetime(): int
     {
         $now = new DateTime('now');
         $time = (int) round(($now->getTimeStamp() - $this->getEmailRequestDatetime()->getTimestamp()) / 60);
-        
+
         return $time;
     }
 
-    /**
-     * 
-     */
-    public function eraseConfirmToken()
-    {
-        $this->setEmailRequestToken('erased_token');
-    }
 }

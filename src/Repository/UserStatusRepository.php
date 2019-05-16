@@ -18,33 +18,49 @@ class UserStatusRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, UserStatus::class);
     }
-
-    // /**
-    //  * @return UserStatus[] Returns an array of UserStatus objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    
+    /**
+     * Возвращает активный статус
+     * 
+     * @return UserStatus|null
+     */
+    public function getActiveStatus(): ?UserStatus
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?UserStatus
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('u.code = :code')
+            ->setParameter('code', UserStatus::ACTIVE_STATUS_CODE)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+    
+    /**
+     * Возвращает не подтвержденный статус
+     * 
+     * @return UserStatus|null
+     */
+    public function getNotConfirmedStatus(): ?UserStatus
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.code = :code')
+            ->setParameter('code', UserStatus::NOT_CONFIRMED_STATUS_CODE)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    
+    /**
+     * Возвращает не активный статус
+     * 
+     * @return UserStatus|null
+     */
+    public function getNotActiveStatus(): ?UserStatus
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.code = :code')
+            ->setParameter('code', UserStatus::NOT_ACTIVE_STATUS_CODE)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

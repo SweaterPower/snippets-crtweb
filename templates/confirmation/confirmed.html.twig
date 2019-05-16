@@ -4,8 +4,8 @@
 
 {% block body %}
     <h1>Confirmed!</h1>
-    <a href="/login/">Login</a><br>
-    <b>User Id: </b>{{ userId }}<br>
-    <b>User Name: </b>{{ userName }}<br>
+    <a href="{{ path('app_login') }}">Login</a><br>
+    <b>User Id: </b>{{ user.getId() }}<br>
+    <b>User Name: </b>{{ user.getUsername() }}<br>
     <b>Token: </b>{{ confirmToken }}<br>
 {% endblock %}

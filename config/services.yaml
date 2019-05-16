@@ -8,6 +8,7 @@ parameters:
     database_host: mysql
     database_user: snippets
     database_password: snippetspass
+    token_ttl: 5
 
 services:
     # default configuration for services in *this* file

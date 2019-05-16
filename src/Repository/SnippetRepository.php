@@ -14,9 +14,56 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class SnippetRepository extends ServiceEntityRepository
 {
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Snippet::class);
+    }
+
+    /**
+     * Возвращает конструктор запроса, который находит все сниппеты
+     * 
+     * @return QueryBuilder
+     */
+    public function getFindAllQueryBuilder()
+    {
+        return $this->createQueryBuilder('s');
+    }
+
+    /**
+     * Возвращает конструктор запроса, который находит все сниппеты для указанного владельца
+     * 
+     * @return QueryBuilder
+     */
+    public function getFindByOwnerQueryBuilder($value)
+    {
+        return $this->createQueryBuilder('s')
+                ->andWhere('s.owner = :val')
+                ->setParameter('val', $value);
+    }
+
+    /**
+     * Возвращает конструктор запроса, который находит все публичные сниппеты
+     * 
+     * @return QueryBuilder
+     */
+    public function getFindPublicOnlyQueryBuilder()
+    {
+        return $this->createQueryBuilder('s')
+                ->andWhere('s.isPrivate = 0');
+    }
+
+    /**
+     * Возвращает конструктор запроса, который находит все публичные сниппеты вместе со сниппетами указанного пользователя
+     * 
+     * @return QueryBuilder
+     */
+    public function getFindPublicAndOwnQueryBuilder($value)
+    {
+        return $this->createQueryBuilder('s')
+                ->orWhere('s.owner = :val')
+                ->orWhere('s.isPrivate = 0')
+                ->setParameter('val', $value);
     }
 
     /**
@@ -27,25 +74,35 @@ class SnippetRepository extends ServiceEntityRepository
      */
     public function findByOwner($value)
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.owner = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getResult()
+        return $this->getFindByOwnerQueryBuilder($value)
+                ->getQuery()
+                ->getResult()
         ;
     }
-    
+
     /**
      * Возвращает только публичные сниппеты
      * 
      * @return Snippet[]
      */
-    public function getPublicOnly()
+    public function findPublicOnly()
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.isPrivate = 0')
-            ->getQuery()
-            ->getResult()
+        return $this->getFindPublicOnlyQueryBuilder()
+                ->getQuery()
+                ->getResult()
         ;
     }
+
+    /**
+     * Возвращает все публичные сниппеты вместе со сниппетами указанного пользователя
+     * 
+     * @return Snippet[]
+     */
+    public function findPublicAndOwnQueryBuilder($value)
+    {
+        return $this->getFindPublicAndOwnQueryBuilder($value)
+                ->getQuery()
+                ->getResult();
+    }
+
 }

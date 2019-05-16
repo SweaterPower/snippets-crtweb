@@ -14,6 +14,7 @@ use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Entity\UserRole;
 use Swift_Mailer;
+use App\Service\RandomTokenGenerator;
 
 /**
  * Контроллер для регистрации, подтверждения регистрации и логина пользователей.
@@ -54,18 +55,18 @@ class SecurityController extends AbstractController
         $userRepo = $manager->getRepository(User::class);
         $userStatusRepo = $manager->getRepository(UserStatus::class);
 
-        $user = $userRepo->findOneBy(['id' => $userId]);
-        $userStatus = $userStatusRepo->findOneBy(['code' => 'active']);
+        $user = $userRepo->find($userId);
+        $userStatus = $userStatusRepo->getActiveStatus();
+        $tokenTTL = $this->getParameter('token_ttl');//container->get('parameter_bag')->get('token_ttl');
 
-        if ($user !== null && $userStatus !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $this->tokenTTL) {
+        if ($user !== null && $userStatus !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $tokenTTL) {
             $user->setStatus($userStatus);
-            $user->eraseConfirmToken();
+            $user->setEmailRequestToken('');
 
             $manager->flush();
 
             return $this->render('confirmation/confirmed.html.twig', [
-                    'userId' => $userId,
-                    'userName' => $user->getUsername(),
+                    'user' => $user,
                     'confirmToken' => $confirmToken,
             ]);
         } else {
@@ -78,7 +79,7 @@ class SecurityController extends AbstractController
      * 
      * @Route("/register", name="app_register")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, Swift_Mailer $mailer): Response
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, Swift_Mailer $mailer, RandomTokenGenerator $generator): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -88,8 +89,9 @@ class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $manager = $this->getDoctrine()->getManager();
 
-            $userRole = $manager->getRepository(UserRole::class)->findOneBy(['code' => 'ROLE_USER']);
-            $userStatus = $manager->getRepository(UserStatus::class)->findOneBy(['code' => 'not_confirmed']);
+            $userRole = $manager->getRepository(UserRole::class)->getRoleUser();
+            $userStatus = $manager->getRepository(UserStatus::class)->getNotConfirmedStatus();
+            $token = $generator->getToken();
 
             if ($userRole !== null && $userStatus !== null) {
                 $user->setPassword(
@@ -100,12 +102,12 @@ class SecurityController extends AbstractController
                 );
                 $user->addRole($userRole);
                 $user->setStatus($userStatus);
-                $user->generateEmailToken();
+                $user->updateEmailToken($token);
 
                 $manager->persist($user);
                 $manager->flush();
 
-                $this->SendConfirtamionEmail($mailer, $user);
+                $this->sendConfirtamionEmail($mailer, $user);
 
                 return $this->render('registration/confirm.html.twig');
             }
@@ -122,7 +124,7 @@ class SecurityController extends AbstractController
      * @param Swift_Mailer $mailer
      * @param User $user
      */
-    private function SendConfirtamionEmail(Swift_Mailer $mailer, User $user)
+    private function sendConfirtamionEmail(Swift_Mailer $mailer, User $user) : void
     {
         $url = $this->generateUrl('app_confirmation',
             [
@@ -132,7 +134,7 @@ class SecurityController extends AbstractController
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $message = (new \Swift_Message('Confirm email'))
+        $message = (new Swift_Message('Confirm email'))
             ->setFrom('send@snpcrt.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView(

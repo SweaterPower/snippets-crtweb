@@ -10,6 +10,9 @@ use App\Entity\Snippet;
 use App\Form\SnippetFormType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Security;
+use App\Service\RandomTokenGenerator;
+use Knp\Bundle\PaginatorBundle\KnpPaginatorBundle;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Контроллер для просмотра списка, редактирования, добавления и удаления сниппетов.
@@ -22,12 +25,18 @@ class SnippetsController extends AbstractController
      * 
      * @Route("/admin", name="app_snippets_admin")
      */
-    public function admin(): Response
+    public function admin(Request $request, PaginatorInterface $paginator): Response
     {
         $manager = $this->getDoctrine()->getManager();
-        $snippets = $manager->getRepository(Snippet::class)->findAll();
 
-        return $this->render('snippets/list.html.twig', ['snippets' => $snippets]);
+        $query = $manager->getRepository(Snippet::class)->getFindAllQueryBuilder();
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /* page number */
+            5 /* limit per page */
+        );
+
+        return $this->render('snippets/list.html.twig', ['pagination' => $pagination]);
     }
 
     /**
@@ -35,7 +44,7 @@ class SnippetsController extends AbstractController
      * 
      * @Route("/snippets/add", name="app_snippets_add")
      */
-    public function add(Request $request, Security $security): Response
+    public function add(Request $request, Security $security, RandomTokenGenerator $generator): Response
     {
         $snippet = new Snippet();
         $form = $this->createForm(SnippetFormType::class, $snippet);
@@ -45,9 +54,10 @@ class SnippetsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $manager = $this->getDoctrine()->getManager();
             $user = $security->getUser();
+            $code = $generator->getToken();
 
-            $snippet->setOwner($user);
-            $snippet->generateUrlCode();
+            $snippet->setOwner($this->getUser());
+            $snippet->setUrlCode($code);
 
             $manager->persist($snippet);
             $manager->flush();
@@ -63,27 +73,30 @@ class SnippetsController extends AbstractController
     /**
      * Вывод отдельного сниппета
      * 
-     * @Route("/snippets/detail/code={code}", name="app_snippets_detail")
+     * @Route("/snippets/detail/{urlCode}", name="app_snippets_detail")
      */
-    public function item(string $code): Response
+    public function item(Snippet $snippet): Response
     {
-        $snippet = $this->getDoctrine()->getManager()->getRepository(Snippet::class)->findOneBy(["urlCode" => $code]);
-        return $this->render('snippets/item.html.twig', [
-                'snippet' => $snippet,
-        ]);
+        if ($this->isGranted('view', $snippet))
+            return $this->render('snippets/item.html.twig', [
+                    'snippet' => $snippet,
+            ]);
+        else
+            return $this->redirectToRoute('app_snippets_list');
     }
 
     /**
      * Удаление сниппета
      * 
-     * @Route("/snippets/delete/code={code}", name="app_snippets_delete")
+     * @Route("/snippets/delete/{urlCode}", name="app_snippets_delete")
      */
-    public function delete(string $code): Response
+    public function delete(Snippet $snippet): Response
     {
-        $manager = $this->getDoctrine()->getManager();
-        $snippet = $manager->getRepository(Snippet::class)->findOneBy(["urlCode" => $code]);
-        $manager->remove($snippet);
-        $manager->flush();
+        if ($this->isGranted('edit', $snippet)) {
+            $manager = $this->getDoctrine()->getManager();
+            $manager->remove($snippet);
+            $manager->flush();
+        }
 
         return $this->redirectToRoute('app_snippets_list');
     }
@@ -91,26 +104,29 @@ class SnippetsController extends AbstractController
     /**
      * Редактирование сниппета
      * 
-     * @Route("/snippets/edit/code={code}", name="app_snippets_edit")
+     * @Route("/snippets/edit/{urlCode}", name="app_snippets_edit")
      */
-    public function edit(string $code, Request $request): Response
+    public function edit(Snippet $snippet, Request $request): Response
     {
-        $manager = $this->getDoctrine()->getManager();
-        $snippet = $manager->getRepository(Snippet::class)->findOneBy(["urlCode" => $code]);
+        if ($this->isGranted('edit', $snippet)) {
+            $manager = $this->getDoctrine()->getManager();
+            $form = $this->createForm(SnippetFormType::class, $snippet);
 
-        $form = $this->createForm(SnippetFormType::class, $snippet);
+            $form->handleRequest($request);
 
-        $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $manager->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $manager->flush();
+                return $this->redirectToRoute('app_snippets_list');
+            }
 
-            return $this->redirectToRoute('app_snippets_list');
+            return $this->render('snippets/form.html.twig', [
+                    'form' => $form->createView(),
+            ]);
         }
-
-        return $this->render('snippets/form.html.twig', [
-                'form' => $form->createView(),
-        ]);
+        else {
+            return $this->redirectToRoute('app_snippets_detail', ['urlCode' => $snippet->getUrlCode()]);
+        }
     }
 
     /**
@@ -118,13 +134,19 @@ class SnippetsController extends AbstractController
      * 
      * @Route("/snippets/profile/", name="app_snippets_profile")
      */
-    public function profile(Security $security)
+    public function profile(Request $request, PaginatorInterface $paginator)
     {
         $manager = $this->getDoctrine()->getManager();
-        $user = $security->getUser();
-        $snippets = $manager->getRepository(Snippet::class)->findByOwner($user->getId());
+        $user = $this->getUser();
+        $query = $manager->getRepository(Snippet::class)->getFindByOwnerQueryBuilder($user->getId());
 
-        return $this->render('snippets/list.html.twig', ['snippets' => $snippets]);
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /* page number */
+            5 /* limit per page */
+        );
+
+        return $this->render('snippets/list.html.twig', ['pagination' => $pagination]);
     }
 
     /**
@@ -132,12 +154,24 @@ class SnippetsController extends AbstractController
      * 
      * @Route("/snippets/", name="app_snippets_list")
      */
-    public function list()
+    public function list(Request $request, PaginatorInterface $paginator)
     {
-        $manager = $this->getDoctrine()->getManager();
-        $snippets = $manager->getRepository(Snippet::class)->getPublicOnly();
+        $repo = $this->getDoctrine()->getManager()->getRepository(Snippet::class);
+        $user = $this->getUser();
+        $query = null;
+        if ($user) {
+            $query = $repo->getFindPublicAndOwnQueryBuilder($user->getId());
+        } else {
+            $query = $repo->getFindPublicOnlyQueryBuilder();
+        }
 
-        return $this->render('snippets/list.html.twig', ['snippets' => $snippets]);
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /* page number */
+            5 /* limit per page */
+        );
+
+        return $this->render('snippets/list.html.twig', ['pagination' => $pagination]);
     }
 
 }
