@@ -3,10 +3,20 @@
 {% block title %}Snippets{% endblock %}
 
 {% block body %}
-    <hl>Placeholder for snippets list.</hl><br>
-    <a href="/snippets/add">Add new snippet</a>
-    {% for snippet in snippets %}
-        {% include 'snippets/item.html.twig' with {'snippet': snippet}%}
-        <a href="/snippets/detail/code={{ snippet.urlCode }}">link</a><br>
-    {% endfor %}
+    <div class="row">
+        <div class="col-sm-12">
+            <b>Total Snippets: ({{ pagination.getTotalItemCount }})</b>
+            <a href="{{ path('app_snippets_add') }}">Add new snippet</a>
+            <table class="table table-striped">
+                <tbody>
+                {% for snippet in pagination %}
+                    {% include 'snippets/item.html.twig' with {'snippet': snippet}%}
+                    <a href="{{ path('app_snippets_detail', {'urlCode': snippet.urlCode}) }}">link</a><br>
+                {% endfor %}
+                </tbody>
+            </table>
+                
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    </div>
 {% endblock %}

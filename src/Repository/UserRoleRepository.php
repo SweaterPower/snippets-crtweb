@@ -19,32 +19,33 @@ class UserRoleRepository extends ServiceEntityRepository
         parent::__construct($registry, UserRole::class);
     }
 
-    // /**
-    //  * @return UserRole[] Returns an array of UserRole objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * Возвращает роль пользователя
+     * 
+     * @return UserRole|null
+     */
+    public function getRoleUser(): ?UserRole
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?UserRole
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('u.code = :code')
+            ->setParameter('code', UserRole::USER_ROLE_USER)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+    
+    /**
+     * Возвращает роль администратора
+     * 
+     * @return UserRole|null
+     */
+    public function getRoleAdmin(): ?UserRole
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.code = :code')
+            ->setParameter('code', UserRole::USER_ROLE_ADMIN)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

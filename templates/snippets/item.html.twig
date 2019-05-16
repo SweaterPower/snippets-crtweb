@@ -9,6 +9,6 @@
         {% endif %}
     </b><br>
     <a>Snippet text:<br>{{ snippet.text }}</a><br>
-    <a href="/snippets/edit/code={{ snippet.urlCode }}">edit</a><br>
-    <a href="/snippets/delete/code={{ snippet.urlCode }}" onclick="return confirm('Are you sure?')">delete</a>
+    <a href="{{ path('app_snippets_edit', {'urlCode': snippet.urlCode}) }}">edit</a><br>
+    <a href="{{ path('app_snippets_delete', {'urlCode': snippet.urlCode}) }}" onclick="return confirm('Are you sure?')">delete</a>
 </div>

@@ -12,6 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class UserRole
 {
+    const USER_ROLE_USER = 'ROLE_USER';
+    const USER_ROLE_ADMIN = 'ROLE_ADMIN';
+    
     /**
      * Уникальный идентификатор.
      * 

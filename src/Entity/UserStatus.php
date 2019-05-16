@@ -12,6 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class UserStatus
 {
+    const ACTIVE_STATUS_CODE = 'active';
+    const NOT_CONFIRMED_STATUS_CODE = 'not_confirmed';
+    const NOT_ACTIVE_STATUS_CODE = 'not_active';
+    
     /**
      * Уникальный идентификатор.
      * 
