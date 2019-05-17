@@ -15,11 +15,12 @@ use Symfony\Component\Validator\Constraints\Length;
  */
 class RegistrationFormType extends AbstractType
 {
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', null, [ 'required' => true])
-            ->add('username', null, [ 'required' => true ])
+            ->add('email', null, ['required' => true])
+            ->add('username', null, ['required' => true])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
@@ -27,13 +28,13 @@ class RegistrationFormType extends AbstractType
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
-                    ]),
+                        ]),
                     new Length([
                         'min' => 6,
                         'minMessage' => 'Your password should be at least {{ limit }} characters',
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
-                    ]),
+                        ]),
                 ],
             ])
         ;
@@ -45,4 +46,5 @@ class RegistrationFormType extends AbstractType
             'data_class' => User::class,
         ]);
     }
+
 }

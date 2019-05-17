@@ -44,7 +44,7 @@ class SnippetsController extends AbstractController
      * 
      * @Route("/snippets/add", name="app_snippets_add")
      */
-    public function add(Request $request, Security $security, RandomTokenGenerator $generator): Response
+    public function add(Request $request, RandomTokenGenerator $generator): Response
     {
         $snippet = new Snippet();
         $form = $this->createForm(SnippetFormType::class, $snippet);
@@ -53,7 +53,6 @@ class SnippetsController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $manager = $this->getDoctrine()->getManager();
-            $user = $security->getUser();
             $code = $generator->getToken();
 
             $snippet->setOwner($this->getUser());
@@ -77,12 +76,13 @@ class SnippetsController extends AbstractController
      */
     public function item(Snippet $snippet): Response
     {
-        if ($this->isGranted('view', $snippet))
+        if ($this->isGranted('view', $snippet)) {
             return $this->render('snippets/item.html.twig', [
                     'snippet' => $snippet,
             ]);
-        else
+        } else {
             return $this->redirectToRoute('app_snippets_list');
+        }
     }
 
     /**
@@ -123,8 +123,7 @@ class SnippetsController extends AbstractController
             return $this->render('snippets/form.html.twig', [
                     'form' => $form->createView(),
             ]);
-        }
-        else {
+        } else {
             return $this->redirectToRoute('app_snippets_detail', ['urlCode' => $snippet->getUrlCode()]);
         }
     }
