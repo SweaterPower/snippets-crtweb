@@ -4,19 +4,52 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-sm-12">
-            <b>Total Snippets: ({{ pagination.getTotalItemCount }})</b>
-            <a href="{{ path('app_snippets_add') }}">Add new snippet</a>
-            <table class="table table-striped">
-                <tbody>
+        <div class="col-6 offset-3">
+            <div class="alert alert-success" role="alert">
+                <div class="alert alert-light" role="alert">
+                    <b>Total snippets count: {{ pagination.getTotalItemCount }}</b>
+                </div>
+                <a href="{{ path('app_snippets_add') }}" class="btn btn-success" role="button">Add new snippet</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <ul class="list-group">
                 {% for snippet in pagination %}
-                    {% include 'snippets/item.html.twig' with {'snippet': snippet}%}
-                    <a href="{{ path('app_snippets_detail', {'urlCode': snippet.urlCode}) }}">link</a><br>
+                    <li class="list-group-item">
+                        <div class="alert alert-success" role="alert">
+                            <h5>
+                                {{ snippet.title }}<br>
+                                <small class="text-muted">Created by: {{  snippet.owner.username }}</small>
+                            </h5>
+                        </div>
+                        <div class="alert alert-light" role="alert">
+                            <div class="alert alert-light" role="alert">
+                                <pre>{{ snippet.text }}</pre>
+                            </div>
+                            <div class="btn-toolbar mb-3" role="toolbar">
+                                <div class="btn-group mr-2" role="group">
+                                    <a href="{{ path('app_snippets_detail', {'urlCode': snippet.urlCode}) }}" class="btn btn-success" role="button">
+                                        view
+                                    </a>
+                                </div>
+                                <div class="btn-group mr-2" role="group">
+                                    <a href="{{ path('app_snippets_edit', {'urlCode': snippet.urlCode}) }}" class="btn btn-success" role="button">
+                                        edit
+                                    </a>
+                                </div>
+                                <div class="btn-group mr-2" role="group">
+                                    <a href="{{ path('app_snippets_delete', {'urlCode': snippet.urlCode}) }}" onclick="return confirm('Are you sure?')" class="btn btn-success" role="button">
+                                        delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
                 {% endfor %}
-                </tbody>
-            </table>
-                
-            {{ knp_pagination_render(pagination) }}
+            </ul>
+            {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig') }}
         </div>
     </div>
 {% endblock %}

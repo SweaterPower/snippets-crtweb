@@ -58,7 +58,7 @@ class SnippetVoter extends Voter
                 return $this->canEdit($snippet, $user);
         }
 
-        throw new LogicException('Snippet voter error.');
+        throw new \LogicException('Snippet voter error.');
     }
 
     private function canView(Snippet $snippet, User $user)

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Snippet;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @method Snippet|null find($id, $lockMode = null, $lockVersion = null)

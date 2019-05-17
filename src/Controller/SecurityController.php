@@ -21,14 +21,6 @@ use App\Service\RandomTokenGenerator;
  */
 class SecurityController extends AbstractController
 {
-
-    /**
-     * Время жизни токена подтверждения электронной почты
-     * 
-     * @var int
-     */
-    private $tokenTTL = 5;
-
     /**
      * Аутентификация пользователя по логину и паролю
      * 
@@ -57,7 +49,7 @@ class SecurityController extends AbstractController
 
         $user = $userRepo->find($userId);
         $userStatus = $userStatusRepo->getActiveStatus();
-        $tokenTTL = $this->getParameter('token_ttl');//container->get('parameter_bag')->get('token_ttl');
+        $tokenTTL = $this->getParameter('token_ttl');
 
         if ($user !== null && $userStatus !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $tokenTTL) {
             $user->setStatus($userStatus);
@@ -134,7 +126,7 @@ class SecurityController extends AbstractController
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $message = (new Swift_Message('Confirm email'))
+        $message = (new \Swift_Message('Confirm email'))
             ->setFrom('send@snpcrt.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView(
