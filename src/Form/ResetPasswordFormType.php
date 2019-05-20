@@ -9,20 +9,20 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
- * Форма регистрации нового пользователя
+ * Форма для ввода нового пароля
  */
-class RegistrationFormType extends AbstractType
+class ResetPasswordFormType extends AbstractType
 {
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', null, ['required' => true])
-            ->add('username', null, ['required' => true])
-            ->add('plainPassword', PasswordType::class, [
-                'mapped' => false,
+            ->add('plainPassword', TextType::class, [
+                'required' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
@@ -32,16 +32,9 @@ class RegistrationFormType extends AbstractType
                         'minMessage' => 'Your password should be at least {{ limit }} characters',
                         'max' => 4096,
                         ]),
-                ],
+                ]
             ])
-        ;
-    }
-
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'data_class' => User::class,
-        ]);
+            ->add('save', SubmitType::class);
     }
 
 }

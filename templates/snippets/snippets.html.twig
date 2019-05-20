@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Snippets{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="alert alert-success" role="alert">
+                <div class="alert alert-light" role="alert">
+                    <b>Total snippets count: {{ pagination.getTotalItemCount }}</b>
+                </div>
+                <a href="{{ path('app_snippets_add') }}" class="btn btn-success" role="button">Add new snippet</a>
+            </div>
+        </div>
+    </div>
+    {% include 'list.html.twig' with {'pagination':pagination} %}
+{% endblock %}

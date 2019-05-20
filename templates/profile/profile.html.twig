@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="alert alert-light" role="alert">
+                <b>Email: </b><a>{{ user.getEmail() }}</a><br>
+                <b>Username: </b><a>{{ user.getUsername() }}</a><br>
+                <b>Password: </b><a>{{ user.getPassword() }}</a><br>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="btn-toolbar mb-3" role="toolbar">
+                <div class="btn-group mr-2" role="group">
+                    <a href="{{ path('app_reset_email') }}" class="btn btn-success" role="button">
+                        change email
+                    </a>
+                </div>
+                <div class="btn-group mr-2" role="group">
+                    <a href="{{ path('app_reset_password') }}" class="btn btn-success" role="button">
+                        change password
+                    </a>
+                </div>
+                <div class="btn-group mr-2" role="group">
+                    <a href="{{ path('app_logout') }}" onclick="return confirm('Are you sure?')" class="btn btn-success" role="button">
+                        logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'snippets/list.html.twig' with {'pagination':pagination} %}    
+{% endblock %}

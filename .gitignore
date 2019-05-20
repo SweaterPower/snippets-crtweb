@@ -26,5 +26,3 @@
 /docker/startdocker.bat
 /docker/var
 /docker/logs
-
-/public/

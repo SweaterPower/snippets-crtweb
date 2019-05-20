@@ -36,7 +36,7 @@ class SnippetsController extends AbstractController
             5 /* limit per page */
         );
 
-        return $this->render('snippets/list.html.twig', ['pagination' => $pagination]);
+        return $this->render('snippets/snippets.html.twig', ['pagination' => $pagination]);
     }
 
     /**
@@ -77,7 +77,7 @@ class SnippetsController extends AbstractController
     public function item(Snippet $snippet): Response
     {
         if ($this->isGranted('view', $snippet)) {
-            return $this->render('snippets/item.html.twig', [
+            return $this->render('snippets/view.html.twig', [
                     'snippet' => $snippet,
             ]);
         } else {
@@ -145,13 +145,13 @@ class SnippetsController extends AbstractController
             5 /* limit per page */
         );
 
-        return $this->render('snippets/list.html.twig', ['pagination' => $pagination]);
+        return $this->render('snippets/snippets.html.twig', ['pagination' => $pagination]);
     }
 
     /**
      * Вывод списка публичных сниппетов
      * 
-     * @Route("/snippets/", name="app_snippets_list")
+     * @Route("/snippets/list", name="app_snippets_list")
      */
     public function list(Request $request, PaginatorInterface $paginator)
     {
@@ -170,7 +170,7 @@ class SnippetsController extends AbstractController
             5 /* limit per page */
         );
 
-        return $this->render('snippets/list.html.twig', ['pagination' => $pagination]);
+        return $this->render('snippets/snippets.html.twig', ['pagination' => $pagination]);
     }
 
 }

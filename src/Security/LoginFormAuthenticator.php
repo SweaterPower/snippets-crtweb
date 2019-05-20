@@ -18,6 +18,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use App\Entity\UserStatus;
 
 /**
  * Аутентификатор для формы логина
@@ -73,7 +74,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
             throw new CustomUserMessageAuthenticationException('Email could not be found.');
         }
         
-        if ($user->getStatus()->getCode() == 'not_confirmed') {
+        if ($user->getStatus() != $this->entityManager->getRepository(UserStatus::class)->getActiveStatus()) {
             throw new CustomUserMessageAuthenticationException('Email address not confirmed.');
         }
 
