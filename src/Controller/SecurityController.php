@@ -65,7 +65,6 @@ class SecurityController extends AbstractController
                     'confirmToken' => $confirmToken,
             ]);
         } else {
-            $manager->refresh();
             return $this->render('confirmation/expired.html.twig');
         }
     }
@@ -246,7 +245,7 @@ class SecurityController extends AbstractController
      * 
      * @Route("/confirm/password/{userId}/{confirmToken}", name="app_confirm_password")
      */
-    private function confirmResetPassword(int $userId, string $confirmToken, UserPasswordEncoderInterface $passwordEncoder)
+    private function confirmResetPassword(Request $request, int $userId, string $confirmToken, UserPasswordEncoderInterface $passwordEncoder)
     {
         $manager = $this->getDoctrine()->getManager();
         $userRepo = $manager->getRepository(User::class);
@@ -254,7 +253,7 @@ class SecurityController extends AbstractController
         $user = $userRepo->find($userId);
         $tokenTTL = $this->getParameter('token_ttl');
 
-        if ($user !== null && userStatus !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $tokenTTL) {
+        if ($user !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $tokenTTL) {
             $form = $this->createForm(ResetPasswordFormType::class);
 
             $form->handleRequest($request);
