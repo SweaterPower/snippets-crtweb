@@ -19,7 +19,8 @@ use App\Entity\User;
  */
 class ProfileController extends AbstractController
 {
-   /**
+
+    /**
      * Смена адреса электронной почты
      * 
      * @Route("/change/email", name="app_change_email")
@@ -36,7 +37,7 @@ class ProfileController extends AbstractController
             $token = $generator->getToken();
             $user->updateEmailToken($token);
             $newEmail = $form->get('email')->getData();
-            
+
             $this->sendConfirtamionEmail('app_confirm_email',
                 [
                     'userId' => $user->getId(),
@@ -196,7 +197,7 @@ class ProfileController extends AbstractController
             return $this->render('confirmation/expired.html.twig');
         }
     }
-    
+
     /**
      * Отправляет на почту сообщение для подтверждения почты
      * 
@@ -218,4 +219,5 @@ class ProfileController extends AbstractController
             'text/html');
         $mailer->send($message);
     }
+
 }
