@@ -1,32 +1,28 @@
-{% extends 'base.html.twig' %}
-
-{% block body %}
-    <div class="alert alert-success" role="alert">
-        <h5>
-            {{ snippet.title }}<br>
-            <small class="text-muted">Created by: {{  snippet.owner.username }}</small>
-        </h5>
-    </div>
+<div class="alert alert-success" role="alert">
+    <h5>
+        {{ snippet.title }}<br>
+        <small class="text-muted">Created by: {{  snippet.owner.username }}</small>
+    </h5>
+</div>
+<div class="alert alert-light" role="alert">
     <div class="alert alert-light" role="alert">
-        <div class="alert alert-light" role="alert">
-            <pre>{{ snippet.text }}</pre>
+        <pre>{{ snippet.text }}</pre>
+    </div>
+    <div class="btn-toolbar mb-3" role="toolbar">
+        <div class="btn-group mr-2" role="group">
+            <a href="{{ path('app_snippets_detail', {'urlCode': snippet.urlCode}) }}" class="btn btn-success" role="button">
+                view
+            </a>
         </div>
-        <div class="btn-toolbar mb-3" role="toolbar">
-            <div class="btn-group mr-2" role="group">
-                <a href="{{ path('app_snippets_detail', {'urlCode': snippet.urlCode}) }}" class="btn btn-success" role="button">
-                    view
-                </a>
-            </div>
-            <div class="btn-group mr-2" role="group">
-                <a href="{{ path('app_snippets_edit', {'urlCode': snippet.urlCode}) }}" class="btn btn-success" role="button">
-                    edit
-                </a>
-            </div>
-            <div class="btn-group mr-2" role="group">
-                <a href="{{ path('app_snippets_delete', {'urlCode': snippet.urlCode}) }}" onclick="return confirm('Are you sure?')" class="btn btn-success" role="button">
-                    delete
-                </a>
-            </div>
+        <div class="btn-group mr-2" role="group">
+            <a href="{{ path('app_snippets_edit', {'urlCode': snippet.urlCode}) }}" class="btn btn-success" role="button">
+                edit
+            </a>
+        </div>
+        <div class="btn-group mr-2" role="group">
+            <a href="{{ path('app_snippets_delete', {'urlCode': snippet.urlCode}) }}" onclick="return confirm('Are you sure?')" class="btn btn-success" role="button">
+                delete
+            </a>
         </div>
     </div>
-{% endblock %}
+</div>

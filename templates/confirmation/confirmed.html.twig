@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1>Confirmed!</h1>
-    <a href="{{ path('app_login') }}" class="btn btn-primary" role="button">Login</a><br>
+    <a href="{{ path('app_login') }}" class="btn btn-secondary" role="button">Login</a><br>
     <b>User Id: </b>{{ user.getId() }}<br>
     <b>User Name: </b>{{ user.getUsername() }}<br>
     <b>Token: </b>{{ confirmToken }}<br>

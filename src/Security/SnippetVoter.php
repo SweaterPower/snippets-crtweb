@@ -40,17 +40,16 @@ class SnippetVoter extends Voter
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
         $user = $token->getUser();
-
+        $snippet = $subject;
+        
         if (!$user instanceof User) {
-            return false;
+            return !$snippet->getIsPrivate();
         }
 
         if ($this->decisionManager->decide($token, array(UserRole::USER_ROLE_ADMIN))) {
             return true;
         }
         
-        $snippet = $subject;
-
         switch ($attribute) {
             case self::VIEW:
                 return $this->canView($snippet, $user);

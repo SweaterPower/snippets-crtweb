@@ -16,18 +16,23 @@
         <div class="col-6 offset-3">
             <div class="btn-toolbar mb-3" role="toolbar">
                 <div class="btn-group mr-2" role="group">
-                    <a href="{{ path('app_reset_email') }}" class="btn btn-success" role="button">
-                        change email
+                    <a href="{{ path('app_snippets_add') }}" class="btn btn-success" role="button">
+                        Add new snippet
                     </a>
                 </div>
                 <div class="btn-group mr-2" role="group">
-                    <a href="{{ path('app_reset_password') }}" class="btn btn-success" role="button">
-                        change password
+                    <a href="{{ path('app_change_email') }}" class="btn btn-success" role="button">
+                        Change email
                     </a>
                 </div>
                 <div class="btn-group mr-2" role="group">
-                    <a href="{{ path('app_logout') }}" onclick="return confirm('Are you sure?')" class="btn btn-success" role="button">
-                        logout
+                    <a href="{{ path('app_change_password') }}" class="btn btn-success" role="button">
+                        Change password
+                    </a>
+                </div>
+                <div class="btn-group mr-2" role="group">
+                    <a href="{{ path('app_logout') }}" class="btn btn-success" role="button">
+                        Logout
                     </a>
                 </div>
             </div>

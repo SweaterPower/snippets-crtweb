@@ -1,16 +1,12 @@
-{% extends 'base.html.twig' %}
-
-{% block body %}
-    <div class="row">
-        <div class="col-6 offset-3">
-            <ul class="list-group">
-                {% for snippet in pagination %}
-                    <li class="list-group-item">
-                        {% include 'item.html.twig' with {'snippet':snippet} %}
-                    </li>
-                {% endfor %}
-            </ul>
-            {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig') }}
-        </div>
+<div class="row">
+    <div class="col-6 offset-3">
+        <ul class="list-group">
+            {% for snippet in pagination %}
+                <li class="list-group-item">
+                    {% include 'snippets/item.html.twig' with {'snippet':snippet} %}
+                </li>
+            {% endfor %}
+        </ul>
+        {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig') }}
     </div>
-{% endblock %}
+</div>

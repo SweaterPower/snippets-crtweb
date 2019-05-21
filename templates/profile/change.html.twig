@@ -4,11 +4,11 @@
 
 {% block body %}
     <div class="row">
-        <div class="alert alert-light" role="alert">
-            <b>{{ title }}</b>
-        </div>
         <div class="col-6 offset-3">
-            {{ form(form) }}
+            <div class="alert alert-light" role="alert">
+                <b>{{ title }}</b>
+                {{ form(form) }}
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -137,15 +137,24 @@ class SnippetsController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
         $user = $this->getUser();
-        $query = $manager->getRepository(Snippet::class)->getFindByOwnerQueryBuilder($user->getId());
+        if ($user !== null) {
+            $query = $manager->getRepository(Snippet::class)->getFindByOwnerQueryBuilder($user->getId());
 
-        $pagination = $paginator->paginate(
-            $query, /* query NOT result */
-            $request->query->getInt('page', 1), /* page number */
-            5 /* limit per page */
-        );
+            $pagination = $paginator->paginate(
+                $query, /* query NOT result */
+                $request->query->getInt('page', 1), /* page number */
+                5 /* limit per page */
+            );
 
-        return $this->render('snippets/snippets.html.twig', ['pagination' => $pagination]);
+            return $this->render('profile/profile.html.twig',
+                    [
+                        'pagination' => $pagination,
+                        'user' => $user,
+                    ]
+            );
+        } else {
+            return $this->redirectToRoute('app_login');
+        }
     }
 
     /**
