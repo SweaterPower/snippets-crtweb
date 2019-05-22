@@ -28,7 +28,7 @@ class ResetEmailFormType extends AbstractType
                         'message' => 'Email is not valid',
                         ])],
             ])
-            ->add('save', SubmitType::class);
+            ->add('Submit', SubmitType::class);
     }
 
 }

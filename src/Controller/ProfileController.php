@@ -34,26 +34,28 @@ class ProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($user !== null && $form->isSubmitted() && $form->isValid()) {
-            $token = $generator->getToken();
-            $user->updateEmailToken($token);
             $newEmail = $form->get('email')->getData();
+            $checkUser = $manager->getRepository(User::class)->findOneBy(['email' => $newEmail]);
 
-            $this->sendConfirtamionEmail('app_confirm_email',
-                [
-                    'userId' => $user->getId(),
-                    'confirmToken' => $user->getEmailRequestToken(),
-                    'newEmail' => $newEmail,
-                ],
-                $newEmail, $mailer);
+            if ($checkUser === null) {
+                $token = $generator->getToken();
+                $user->updateEmailToken($token);
+                $this->sendConfirtamionEmail('app_confirm_email',
+                    [
+                        'userId' => $user->getId(),
+                        'confirmToken' => $user->getEmailRequestToken(),
+                        'newEmail' => $newEmail,
+                    ],
+                    $newEmail, $mailer);
 
-            $manager->flush();
-
+                $manager->flush();
+            }
             return $this->render('profile/confirm.html.twig');
         }
 
         return $this->render('profile/change.html.twig', [
                 'form' => $form->createView(),
-                'title' => 'Change email',
+                'title' => 'Enter new email',
         ]);
     }
 
@@ -85,7 +87,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/change.html.twig', [
                 'form' => $form->createView(),
-                'title' => 'Change password',
+                'title' => 'Enter new password',
         ]);
     }
 
@@ -191,7 +193,7 @@ class ProfileController extends AbstractController
 
             return $this->render('profile/change.html.twig', [
                     'form' => $form->createView(),
-                    'title' => 'New password',
+                    'title' => 'Enter new password',
             ]);
         } else {
             return $this->render('confirmation/expired.html.twig');

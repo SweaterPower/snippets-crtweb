@@ -31,7 +31,7 @@ class ResetPasswordFormType extends AbstractType
                         ]),
                 ]
             ])
-            ->add('save', SubmitType::class);
+            ->add('Submit', SubmitType::class);
     }
 
 }

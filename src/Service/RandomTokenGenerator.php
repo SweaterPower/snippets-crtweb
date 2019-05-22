@@ -11,6 +11,6 @@ class RandomTokenGenerator
      */
     public function getToken(): string
     {
-        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+        return md5(random_bytes(32));
     }
 }
