@@ -9,3 +9,20 @@ knp_paginator:
         pagination: '@KnpPaginator/Pagination/sliding.html.twig'     # sliding pagination controls template         
         sortable: '@KnpPaginator/Pagination/sortable_link.html.twig' # sort link template                                
         filtration: '@KnpPaginator/Pagination/filtration.html.twig'  # filters template
+        
+fos_rest:
+    routing_loader:
+        default_format: json
+        include_format: false
+    body_listener: true
+    format_listener:
+          rules:
+              - { path: '^/', priorities: ['json'], fallback_format: json, prefer_extension: false }
+    param_fetcher_listener: true
+    access_denied_listener:
+        json: true
+    view:
+        view_response_listener: 'force'
+        formats:
+            json: true
+    disable_csrf_role: ROLE_API

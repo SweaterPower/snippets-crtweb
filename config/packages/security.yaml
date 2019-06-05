@@ -27,6 +27,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/api/snippets, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/api/snippet, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/snippets/list, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/snippets/detail, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY] }
