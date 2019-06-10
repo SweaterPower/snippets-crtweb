@@ -48,4 +48,19 @@ class UserRoleRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+    
+     /**
+     * Возвращает роль для подключения через API
+     * 
+     * @return UserRole|null
+     */
+    public function getRoleAPI(): ?UserRole
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.code = :code')
+            ->setParameter('code', UserRole::USER_ROLE_API)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

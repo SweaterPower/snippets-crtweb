@@ -14,6 +14,7 @@ class UserRole
 {
     const USER_ROLE_USER = 'ROLE_USER';
     const USER_ROLE_ADMIN = 'ROLE_ADMIN';
+    const USER_ROLE_API = 'ROLE_API';
     
     /**
      * Уникальный идентификатор.

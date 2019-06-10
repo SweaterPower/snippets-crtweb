@@ -11,9 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use App\Entity\Snippet;
 use App\Form\ApiSnippetFormType;
 use App\Service\RandomTokenGenerator;
-
-///DELET THIS!!!
 use App\Entity\User;
+use App\Entity\UserRole;
 
 /**
  * Контроллер для доступа к сниппетам с помощью REST API
@@ -21,6 +20,36 @@ use App\Entity\User;
  */
 class RestController extends FOSRestController
 {
+
+    /**
+     * Выдает пользователю токен доступа
+     * @Rest\Get("/login")
+     *
+     * @return Response
+     */
+    public function getAccessTokenAction(Request $request, RandomTokenGenerator $generator)
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'];
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
+        if ($user !== null)
+        {
+            $manager = $this->getDoctrine()->getManager();
+            $token = $generator->getToken();
+            $userRole = $manager->getRepository(UserRole::class)->getRoleAPI();
+            
+            if ($userRole !== null)
+            {
+                $user->addRole($userRole);
+                $user->setApiToken($token);
+                $manager->flush();
+                
+                return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_OK)->setTemplate('api/result.html.twig')->setTemplateVar('status'));
+            }
+            return $this->handleView($this->view(['status' => 'not ok: 501'], Response::HTTP_NOT_IMPLEMENTED)->setTemplate('api/result.html.twig')->setTemplateVar('status'));
+        }
+        return $this->handleView($this->view(['status' => 'not ok: 500'], Response::HTTP_INTERNAL_SERVER_ERROR)->setTemplate('api/result.html.twig')->setTemplateVar('status'));
+    }
 
     /**
      * Возвращает список сниппетов
@@ -37,7 +66,7 @@ class RestController extends FOSRestController
 
     /**
      * Создает сниппет
-     * @Rest\Post("/snippet")
+     * @Rest\Post("/add")
      *
      * @return Response
      */

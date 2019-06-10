@@ -22,6 +22,11 @@ security:
             form_login: true
             logout:
                 path:   app_logout
+        api:
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Security\TokenAuthenticator
 
        
     # Easy way to control access for large sections of your site
