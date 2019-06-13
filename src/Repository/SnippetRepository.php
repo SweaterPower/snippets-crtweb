@@ -99,7 +99,7 @@ class SnippetRepository extends ServiceEntityRepository
      * 
      * @return Snippet[]
      */
-    public function findPublicAndOwnQueryBuilder($value)
+    public function findPublicAndOwn($value)
     {
         return $this->getFindPublicAndOwnQueryBuilder($value)
                 ->getQuery()

@@ -3,14 +3,19 @@ security:
         App\Entity\User:
             algorithm: bcrypt
 
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
     firewalls:
+        api:
+            anonymous: true
+            pattern: ^/api/
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Security\TokenAuthenticator
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -22,18 +27,11 @@ security:
             form_login: true
             logout:
                 path:   app_logout
-        api:
-            stateless: true
-            guard:
-                authenticators:
-                    - App\Security\TokenAuthenticator
-
        
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/api/snippets, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY ] }
-        - { path: ^/api/snippet, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/api/snippets, roles: [ROLE_API ] }
+        - { path: ^/api/snippet, roles: [ROLE_API ] }
+        - { path: ^/api/login, roles: [IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/snippets/list, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/snippets/detail, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY] }

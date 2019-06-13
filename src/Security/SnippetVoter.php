@@ -46,7 +46,6 @@ class SnippetVoter extends Voter
             return !$snippet->getIsPrivate();
         }
 
-        //if ($this->decisionManager->decide($token, array(UserRole::USER_ROLE_ADMIN))) {
         if (in_array(UserRole::USER_ROLE_ADMIN, $token->getRoles())) {
             return true;
         }

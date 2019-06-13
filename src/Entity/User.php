@@ -70,6 +70,7 @@ class User implements UserInterface
     /**
      * Сниппеты пользователя.
      * 
+     * @var ArrayCollection
      * @ORM\OneToMany(targetEntity="App\Entity\Snippet", mappedBy="owner", orphanRemoval=true)
      */
     private $snippets;
@@ -189,7 +190,7 @@ class User implements UserInterface
     /**
      * @return Collection|Snippet[]
      */
-    public function getSnippets(): array
+    public function getSnippets(): Collection
     {
         return $this->snippets;
     }
