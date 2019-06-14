@@ -8,7 +8,8 @@ parameters:
     database_host: mysql
     database_user: snippets
     database_password: snippetspass
-    token_ttl: 5
+    email_token_ttl: 5
+    access_token_ttl: 60
 
 services:
     # default configuration for services in *this* file
@@ -32,3 +33,8 @@ services:
     # please note that last definitions always *replace* previous ones
     sensio_framework_extra.view.listener:
         alias: Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener
+        
+    App\Service\TokenManager:
+        autowire: true
+        arguments: 
+            $tokenTTL: '%access_token_ttl%'

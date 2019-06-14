@@ -102,7 +102,7 @@ class ProfileController extends AbstractController
         $userRepo = $manager->getRepository(User::class);
 
         $user = $userRepo->find($userId);
-        $tokenTTL = $this->getParameter('token_ttl');
+        $tokenTTL = $this->getParameter('email_token_ttl');
 
         if ($user !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $tokenTTL) {
             $user->setEmailRequestToken('');
@@ -167,7 +167,7 @@ class ProfileController extends AbstractController
         $userRepo = $manager->getRepository(User::class);
 
         $user = $userRepo->find($userId);
-        $tokenTTL = $this->getParameter('token_ttl');
+        $tokenTTL = $this->getParameter('email_token_ttl');
 
         if ($user !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $tokenTTL) {
             $form = $this->createForm(ResetPasswordFormType::class);

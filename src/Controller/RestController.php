@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -15,10 +16,20 @@ use App\Service\SnippetNormalizer;
 use App\Entity\Snippet;
 use App\Form\ApiSnippetFormType;
 use App\Service\RandomTokenGenerator;
+use App\Service\TokenManager;
 use App\Entity\User;
 use App\Entity\UserRole;
 
 /**
+ * TODO:
+ * Таблицу с токенами (user_id, token, createdDateTime)
+ * Проверку на время жизни токена
+ * Если нет токена, аутентификация по логину паролю
+ * Сервис для выдачи токена
+ * Запрос на обновление токена
+ * Возвращать логичные коды ошибок
+ * Вместе со сниппетом передавать права доступа к нему
+ * 
  * Контроллер для доступа к сниппетам с помощью REST API
  * @Route("/api", name="api_")
  */
@@ -26,36 +37,30 @@ class RestController extends FOSRestController
 {
 
     /**
-     * Генерирует для пользователя токен доступа
-     * @Rest\Get("/login")
+     * Вовзращает пользователю токен доступа после аутентификации по логину и паролю
+     * @Rest\Post("/login")
      *
      * @return Response
      */
-    public function postAccessTokenAction(Request $request, RandomTokenGenerator $generator)
+    public function postLoginAction(Request $request)
     {
-        $message = '';
-        $data = json_decode($request->getContent(), true);
-        $email = $data['email'];
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
-        if ($user !== null) {
-            $manager = $this->getDoctrine()->getManager();
-            $token = $generator->getToken();
-            $userRole = $manager->getRepository(UserRole::class)->getRoleAPI();
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted('api_token', $user);
+        return new Response('{"success":"true"}', Response::HTTP_OK, ['content-type' => 'application/json', 'SNP-AUTH-TOKEN' => $user->getApiToken()]);
+    }
 
-            if ($userRole !== null) {
-                $user->addRole($userRole);
-                $user->setApiToken($token);
-                $manager->flush();
-
-                return new Response('{"success":"true"}', Response::HTTP_OK, ['content-type' => 'application/json', 'SNP-AUTH-TOKEN' => $token]);
-            }
-            else {
-                $message = "authorization error";
-            }
-        } else {
-            $message = "authentication failed";
-        }
-        return new Response('{"success":"false", "message":"' . $message . '"}', Response::HTTP_INTERNAL_SERVER_ERROR, ['content-type' => 'application/json']);
+    /**
+     * Генерирует для пользователя новый токен доступа
+     * @Rest\Post("/refresh")
+     *
+     * @return Response
+     */
+    public function getAccessTokenAction(Request $request, TokenManager $manager)
+    {
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted('api_token', $user);
+        $manager->generateNewToken($user);
+        return new Response('{"success":"true"}', Response::HTTP_OK, ['content-type' => 'application/json', 'SNP-AUTH-TOKEN' => $user->getApiToken()]);
     }
 
     /**
@@ -66,11 +71,13 @@ class RestController extends FOSRestController
      */
     public function getSnippetsAction(SnippetNormalizer $normalizer)
     {
+        $this->denyAccessUnlessGranted('api_token', $this->getUser());
         $repository = $this->getDoctrine()->getRepository(Snippet::class);
         $snippets = $repository->findPublicAndOwn($this->getUser());
 
         if ($snippets !== null) {
             $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
+
             return new Response(
                 $serializer->serialize(
                     $snippets,
@@ -79,7 +86,7 @@ class RestController extends FOSRestController
                 ['content-type' => 'application/json']
             );
         }
-        return new Response("{'message':'snippets not found'}", Response::HTTP_INTERNAL_SERVER_ERROR, ['content-type' => 'application/json']);
+        return new Response("{'message':'snippets not found'}", Response::HTTP_NOT_FOUND, ['content-type' => 'application/json']);
     }
 
     /**
@@ -90,7 +97,9 @@ class RestController extends FOSRestController
      */
     public function getSnippetAction(Request $request, SnippetNormalizer $normalizer)
     {
+        $this->denyAccessUnlessGranted('api_token', $this->getUser());
         $message = '';
+        $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         $data = json_decode($request->getContent(), true);
         $urlCode = $data['urlCode'];
         if ($urlCode !== null) {
@@ -100,26 +109,27 @@ class RestController extends FOSRestController
                 if ($this->isGranted('view', $snippet)) {
                     $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
                     return new Response(
-                        '{"success":"true","data":"' .
                         $serializer->serialize(
                             $snippet,
-                            'json')
-                        . '"}',
+                            'json'),
                         Response::HTTP_OK,
                         ['content-type' => 'application/json']
                     );
                 } else {
+                    $code = Response::HTTP_FORBIDDEN;
                     $message = 'access denied';
                 }
             } else {
+                $code = Response::HTTP_NOT_FOUND;
                 $message = 'snippet not found';
             }
         } else {
+            $code = Response::HTTP_BAD_REQUEST;
             $message = 'bad request data';
         }
         return new Response(
             '{"success":"false", "message":"' . $message . '"}',
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $code,
             ['content-type' => 'application/json']
         );
     }
@@ -132,6 +142,7 @@ class RestController extends FOSRestController
      */
     public function postSnippetAction(Request $request, RandomTokenGenerator $generator, SnippetNormalizer $normalizer)
     {
+        $this->denyAccessUnlessGranted('api_token', $this->getUser());
         $data = $request->getContent();
         $serializer = new Serializer([new GetSetMethodNormalizer()], [new JsonEncoder()]);
         $snippet = $serializer->deserialize($data, Snippet::class, 'json');
@@ -157,7 +168,9 @@ class RestController extends FOSRestController
      */
     public function putSnippetAction(Request $request)
     {
+        $this->denyAccessUnlessGranted('api_token', $this->getUser());
         $message = '';
+        $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         $data = $request->getContent();
         $urlCode = json_decode($data, true)['urlCode'];
         if ($urlCode !== null) {
@@ -176,17 +189,20 @@ class RestController extends FOSRestController
                         ['content-type' => 'application/json']
                     );
                 } else {
+                    $code = Response::HTTP_FORBIDDEN;
                     $message = 'access denied';
                 }
             } else {
+                $code = Response::HTTP_NOT_FOUND;
                 $message = 'snippet not found';
             }
         } else {
+            $code = Response::HTTP_BAD_REQUEST;
             $message = 'bad request data';
         }
         return new Response(
             '{"success" : "false", "message": "' . $message . '"}',
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $code,
             ['content-type' => 'application/json']
         );
     }
@@ -199,7 +215,9 @@ class RestController extends FOSRestController
      */
     public function deleteSnippetAction(Request $request)
     {
+        $this->denyAccessUnlessGranted('api_token', $this->getUser());
         $message = '';
+        $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         $data = $request->getContent();
         $urlCode = json_decode($data, true)['urlCode'];
         if ($urlCode !== null) {
@@ -216,17 +234,20 @@ class RestController extends FOSRestController
                         ['content-type' => 'application/json']
                     );
                 } else {
+                    $code = Response::HTTP_FORBIDDEN;
                     $message = 'access denied';
                 }
             } else {
+                $code = Response::HTTP_NOT_FOUND;
                 $message = 'snippet not found';
             }
         } else {
+            $code = Response::HTTP_BAD_REQUEST;
             $message = 'bad request data';
         }
         return new Response(
             '{"success" : "false", "message": "' . $message . '"}',
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $code,
             ['content-type' => 'application/json']
         );
     }

@@ -4,7 +4,6 @@ namespace App\Security;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use App\Entity\Snippet;
 use App\Entity\User;
 use App\Entity\UserRole;
@@ -17,13 +16,6 @@ class SnippetVoter extends Voter
     const VIEW = 'view';
     const EDIT = 'edit';
     
-    private $decisionManager;
-    
-    public function __construct(AccessDecisionManagerInterface $decisionManager)
-    {
-        $this->decisionManager = $decisionManager;
-    }
-
     protected function supports($attribute, $subject)
     {
         if (!in_array($attribute, array(self::VIEW, self::EDIT))) {

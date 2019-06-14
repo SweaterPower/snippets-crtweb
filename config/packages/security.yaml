@@ -1,4 +1,8 @@
 security:
+    access_decision_manager:
+        strategy: unanimous
+        allow_if_all_abstain: true
+        
     encoders:
         App\Entity\User:
             algorithm: bcrypt
@@ -16,6 +20,8 @@ security:
             guard:
                 authenticators:
                     - App\Security\TokenAuthenticator
+                    - App\Security\LoginApiAuthenticator
+            entry_point: App\Security\TokenAuthenticator
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -29,9 +35,10 @@ security:
                 path:   app_logout
        
     access_control:
-        - { path: ^/api/snippets, roles: [ROLE_API ] }
-        - { path: ^/api/snippet, roles: [ROLE_API ] }
-        - { path: ^/api/login, roles: [IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/api/snippets, roles: ROLE_USER}
+        - { path: ^/api/snippet, roles: ROLE_USER}
+        - { path: ^/api/refresh, roles: ROLE_USER}
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/snippets/list, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/snippets/detail, roles: [ROLE_USER, ROLE_ADMIN, IS_AUTHENTICATED_ANONYMOUSLY] }

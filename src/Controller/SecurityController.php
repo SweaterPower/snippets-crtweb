@@ -50,7 +50,7 @@ class SecurityController extends AbstractController
 
         $user = $userRepo->find($userId);
         $userStatus = $userStatusRepo->getActiveStatus();
-        $tokenTTL = $this->getParameter('token_ttl');
+        $tokenTTL = $this->getParameter('email_token_ttl');
 
         if ($user !== null && $userStatus !== null && $user->getEmailRequestToken() == $confirmToken && $user->getConfirmTokenLifetime() <= $tokenTTL) {
             $user->setStatus($userStatus);
